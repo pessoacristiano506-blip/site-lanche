@@ -14,22 +14,36 @@
     header {background:#ffb74d; padding:15px; border-radius:8px; text-align:center; margin-bottom:20px;}
     h1 {font-size:24px; color:#222;}
     
-    .aviso-amarelo {background:#fff9c4; border-left:4px solid #fbc02d; padding:12px; margin-bottom:20px; border-radius:4px;}
-    
-    .contador-container {background:#fff; border-radius:8px; padding:25px; text-align:center; margin-bottom:25px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-    .contador-valor {font-size:64px; font-weight:bold; color:#e65100; margin:15px 0;}
-    .botao-curtir {background:#ff6f00; color:white; border:none; padding:15px 40px; font-size:20px; border-radius:50px; cursor:pointer; font-weight:bold;}
-    .botao-curtir:active {transform:scale(0.95); background:#e65100;}
-    .botao-curtir:disabled {background:#ccc; cursor:not-allowed;}
-    .atualizacao {font-size:14px; color:#666; margin-top:10px;}
-    
-    .lista {background:#fff; border-radius:8px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+    .lista {background:#fff; border-radius:8px; padding:20px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05);}
     .lista h2 {font-size:18px; margin-bottom:15px; color:#333; border-bottom:2px solid #ffb74d; padding-bottom:8px;}
-    .autorizado {color:#2e7d32; padding:6px 0; border-bottom:1px solid #eee;}
-    .banido {color:#c62828; padding:6px 0; border-bottom:1px solid #eee; font-weight:bold;}
-    .status-badge {display:inline-block; padding:2px 8px; border-radius:12px; font-size:12px; margin-left:8px;}
-    .badge-autorizado {background:#c8e6c9; color:#2e7d32;}
-    .badge-banido {background:#ffcdd2; color:#c62828;}
+    .lista-nomes {list-style:none; margin-bottom:25px;}
+    .lista-nomes li {padding:6px 0; border-bottom:1px solid #eee;}
+    .dono {color:#2e7d32; font-weight:bold;}
+    .normal {color:#333;}
+    .reintegrado {color:#1565c0;}
+    
+    .aba {background:#fff; border-radius:8px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:hidden;}
+    .aba-cabecalho {background:#f5f5f5; padding:12px 15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#333;}
+    .aba-cabecalho:hover {background:#eeeeee;}
+    .aba-seta {transition:transform 0.2s;}
+    .aba.aberta .aba-seta {transform:rotate(180deg);}
+    .aba-conteudo {padding:0 15px; max-height:0; overflow:hidden; transition:all 0.3s ease;}
+    .aba.aberta .aba-conteudo {padding:15px; max-height:500px;}
+    
+    .data-lanche {font-size:15px; color:#666; margin-bottom:10px;}
+    .contador-curtidas {font-size:16px; color:#666; margin-bottom:10px;}
+    .valor-curtidas {font-size:28px; font-weight:bold; color:#e65100; margin:10px 0;}
+    .botao-curtir {background:#ff9800; color:#fff; border:none; padding:8px 20px; font-size:14px; border-radius:20px; cursor:pointer;}
+    .botao-curtir:active {background:#e65100;}
+    .botao-curtir:disabled {background:#ccc; cursor:not-allowed;}
+    
+    .botao-ticket {margin-top:15px;}
+    .botao-ticket button {background:#795548; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;}
+    .ticket {background:#fafafa; border:1px solid #ddd; border-radius:4px; padding:15px; margin-top:10px; display:none;}
+    .ticket.aberto {display:block;}
+    .bilhete-cabecalho {background:#f5f5f5; padding:8px; font-weight:bold; margin-bottom:10px;}
+    .bilhete-conteudo {font-size:14px; line-height:1.6;}
+    .banido {color:#c62828; font-weight:bold;}
     
     footer {text-align:center; margin-top:30px; color:#888; font-size:13px;}
   </style>
@@ -37,33 +51,50 @@
 <body>
 
 <header>
-  <h1>🍔 Lanche de Atividades — Lista Autorizada</h1>
+  <h1>🍔 Lanches — Lista Autorizada</h1>
 </header>
 
-<div class="aviso-amarelo">
-  <strong>📅 Próximo lanche:</strong> 23 de novembro<br>
-  <em>Confirme sua presença abaixo!</em>
-</div>
-
-<div class="contador-container">
-  <h2>👍 Total de Confirmações</h2>
-  <div class="contador-valor" id="contador">—</div>
-  <button class="botao-curtir" id="botaoCurtir" onclick="curtir()">👍 Estarei presente!</button>
-  <div class="atualizacao" id="atualizacao">Conectando...</div>
-</div>
-
 <div class="lista">
-  <h2>✅ Lista de Autorizados</h2>
-  <div class="autorizado">Cristiano — Dono / Organizador <span class="status-badge badge-autorizado">Presente</span></div>
-  <div class="autorizado">Quito — Reintegração autorizada <span class="status-badge badge-autorizado">Autorizado</span></div>
+  <h2>📋 Participantes Autorizados</h2>
+  <ul class="lista-nomes">
+    <li class="dono">👑 Cristiano — Dono/Responsável</li>
+    <li class="normal">✅ Raí</li>
+    <li class="reintegrado">✅ Quito — Reintegração autorizada</li>
+    <li class="normal">✅ Davi</li>
+    <li class="normal">✅ Cristiane</li>
+    <li class="normal">✅ Vitória</li>
+  </ul>
   
-  <h2 style="margin-top:25px;">🚫 Registro de Banimentos Permanentes</h2>
-  <div class="banido">Fabrício — Banido permanentemente, impossível reverter <span class="status-badge badge-banido">Banido</span></div>
+  <div class="aba" id="abaHistorico">
+    <div class="aba-cabecalho" onclick="document.getElementById('abaHistorico').classList.toggle('aberta')">
+      <span>📜 Histórico de Lanches</span>
+      <span class="aba-seta">▼</span>
+    </div>
+    <div class="aba-conteudo">
+      <div class="data-lanche">📅 Lanche finalizado — 22 de novembro</div>
+      <div class="contador-curtidas">Total de curtidas:</div>
+      <div class="valor-curtidas" id="contador-valor">0 curtidas</div>
+      <button class="botao-curtir" id="botao-curtir" onclick="curtir()">Curtir ❤️</button>
+    </div>
+  </div>
+  
+  <div class="botao-ticket">
+    <button onclick="document.getElementById('ticket').classList.toggle('aberto')">🎫 Registro de Ocorrências</button>
+  </div>
+  
+  <div id="ticket" class="ticket">
+    <div class="bilhete-cabecalho">📝 Bilhete L-005 — Fabrício</div>
+    <div class="bilhete-conteudo">
+      <strong>Motivo:</strong> Desrespeito ao dono, comportamento inadequado<br>
+      <strong>Situação:</strong> <span class="banido">Banido Permanentemente — Impossível Reverter</span><br>
+      <strong>Data:</strong> 21/11/2026
+    </div>
+  </div>
 </div>
 
 <footer>
-  Sistema de Controle — Versão 1.1<br>
-  Contador em tempo real ✅
+  Sistema de Controle de Presenças — Versão 2.4<br>
+  ✅ Contador em tempo real dentro do histórico
 </footer>
 
 <script>
@@ -79,29 +110,34 @@
 
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
-  const contadorRef = database.ref('contador_curtidas');
+  const contadorRef = database.ref('curtidas-lanche-22');
+
+  function formatarContador(total) {
+    if (total === 1) return '1 curtida';
+    return total.toLocaleString('pt-BR') + ' curtidas';
+  }
 
   contadorRef.on('value', (snapshot) => {
-    const valor = snapshot.val() || 0;
-    document.getElementById('contador').textContent = valor;
-    document.getElementById('atualizacao').textContent = '✅ Atualizado agora!';
-    document.getElementById('botaoCurtir').disabled = false;
+    const total = snapshot.val() || 0;
+    document.getElementById('contador-valor').textContent = formatarContador(total);
+    document.getElementById('botao-curtir').disabled = false;
   });
 
   function curtir() {
-    document.getElementById('botaoCurtir').disabled = true;
-    contadorRef.transaction((atual) => {
-      return (atual || 0) + 1;
-    }).then(() => {
-      document.getElementById('atualizacao').textContent = '✅ Obrigado!';
-      setTimeout(() => {
-        document.getElementById('atualizacao').textContent = '👆 Clique para confirmar!';
-        document.getElementById('botaoCurtir').disabled = false;
-      }, 2000);
-    }).catch((erro) => {
-      alert('Tente novamente!');
-      document.getElementById('botaoCurtir').disabled = false;
-    });
+    const botao = document.getElementById('botao-curtir');
+    botao.disabled = true;
+    contadorRef.transaction((atual) => (atual || 0) + 1)
+      .then(() => {
+        botao.textContent = '❤️ Obrigado!';
+        setTimeout(() => {
+          botao.textContent = 'Curtir ❤️';
+          botao.disabled = false;
+        }, 1500);
+      })
+      .catch(() => {
+        alert('Tente novamente!');
+        botao.disabled = false;
+      });
   }
 </script>
 
