@@ -4,100 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lanches — Lista Autorizada</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  
   <style>
     * {margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif;}
     body {max-width:800px; margin:0 auto; padding:20px; background:#fff8e6;}
-    header {background:#ffb74d; padding:15px; border-radius:8px; text-align:center;}
+    header {background:#ffb74d; padding:15px; border-radius:8px; text-align:center; margin-bottom:20px;}
     h1 {font-size:24px; color:#222;}
     
-    .comunicado {background:#e8f5e9; padding:25px; margin:15px 0; border-radius:8px; border:2px solid #66bb6a; text-align:center; font-size:18px;}
+    .aviso-amarelo {background:#fff9c4; border-left:4px solid #fbc02d; padding:12px; margin-bottom:20px; border-radius:4px;}
     
-    .fidelidade {background:#fff3e0; padding:25px; margin:15px 0; border-radius:8px; border:2px solid #ff9800; text-align:center;}
-    .botao-curtir {background:#ff5252; color:white; border:none; padding:15px 40px; font-size:20px; border-radius:30px; cursor:pointer; margin-top:15px;}
-    .contador-curtidas {font-size:36px; font-weight:bold; color:#e64a19; margin-top:20px;}
+    .contador-container {background:#fff; border-radius:8px; padding:25px; text-align:center; margin-bottom:25px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+    .contador-valor {font-size:64px; font-weight:bold; color:#e65100; margin:15px 0;}
+    .botao-curtir {background:#ff6f00; color:white; border:none; padding:15px 40px; font-size:20px; border-radius:50px; cursor:pointer; font-weight:bold;}
+    .botao-curtir:active {transform:scale(0.95); background:#e65100;}
+    .botao-curtir:disabled {background:#ccc; cursor:not-allowed;}
+    .atualizacao {font-size:14px; color:#666; margin-top:10px;}
     
-    .card {background:#fff; padding:20px; margin:12px 0; border-radius:8px; border:1px solid #ffcc80;}
-    h2 {font-size:20px; margin-bottom:15px; color:#333;}
-    .lista-nomes {list-style:none; padding:0;}
-    .lista-nomes li {padding:10px 12px; margin:6px 0; border-radius:6px; background:#f9fbe7; border-left:4px solid #8bc34a; font-size:17px;}
-    .lista-nomes li.dono {background:#e3f2fd; border-left:4px solid #1976d2; font-weight:bold;}
+    .lista {background:#fff; border-radius:8px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+    .lista h2 {font-size:18px; margin-bottom:15px; color:#333; border-bottom:2px solid #ffb74d; padding-bottom:8px;}
+    .autorizado {color:#2e7d32; padding:6px 0; border-bottom:1px solid #eee;}
+    .banido {color:#c62828; padding:6px 0; border-bottom:1px solid #eee; font-weight:bold;}
+    .status-badge {display:inline-block; padding:2px 8px; border-radius:12px; font-size:12px; margin-left:8px;}
+    .badge-autorizado {background:#c8e6c9; color:#2e7d32;}
+    .badge-banido {background:#ffcdd2; color:#c62828;}
     
-    .botao-ticket {width:60px; height:60px; border-radius:50%; background:#ff7043; position:fixed; bottom:20px; right:20px; border:none; font-size:22px; cursor:pointer; z-index:999;}
-    .aba-ticket {display:none; position:fixed; bottom:90px; right:20px; width:300px; background:#fffaf0; padding:20px; border-radius:8px; border:2px solid #ffb74d; box-shadow:0 0 15px rgba(0,0,0,0.2);}
-    .aba-ticket.aberto {display:block;}
-    .linha-ticket {background:#fff; padding:10px; border-radius:6px; border:1px solid #ffb74d; margin-bottom:8px;}
-    .conteudo-ticket {margin-top:10px; padding-top:10px; border-top:1px solid #ffdd99; line-height:1.6;}
-    
-    footer {margin-top:30px; text-align:center; color:#666; padding-bottom:20px; font-size:14px;}
-    .contador {margin-top:8px; font-size:13px; color:#888;}
+    footer {text-align:center; margin-top:30px; color:#888; font-size:13px;}
   </style>
 </head>
 <body>
+
 <header>
-  <h1>🍔 Lanches — Lista Autorizada</h1>
+  <h1>🍔 Lanche de Atividades — Lista Autorizada</h1>
 </header>
 
-<div class="comunicado">
-  ✅ LANCHE FINALIZADO — 22 de novembro ✅
-  <p style="margin-top:12px; font-size:16px;">
-    Evento realizado em 22/11/2026 às 11h00<br>
-    Obrigado a todos que participaram! 😊
-  </p>
+<div class="aviso-amarelo">
+  <strong>📅 Próximo lanche:</strong> 23 de novembro<br>
+  <em>Confirme sua presença abaixo!</em>
 </div>
 
-<div class="fidelidade">
-  <h3>💛 Apoie nosso lanche!</h3>
-  <div class="contador-curtidas">
-    <span id="curtidas">0</span> ❤️
-  </div>
-  <button class="botao-curtir" onclick="somar()">❤️ Curtir</button>
+<div class="contador-container">
+  <h2>👍 Total de Confirmações</h2>
+  <div class="contador-valor" id="contador">—</div>
+  <button class="botao-curtir" id="botaoCurtir" onclick="curtir()">👍 Estarei presente!</button>
+  <div class="atualizacao" id="atualizacao">Conectando...</div>
 </div>
 
-<div class="card">
-  <h2>✅ Participantes — 22/11/2026</h2>
-  <ul class="lista-nomes">
-    <li class="dono">👤 Cristiano — Dono/Responsável</li>
-    <li>✅ Cristiane</li>
-    <li>✅ Vitória</li>
-    <li>✅ Davi</li>
-    <li>✅ Raí</li>
-    <li>✅ Quito</li>
-  </ul>
-</div>
-
-<button class="botao-ticket" onclick="document.getElementById('ticket').classList.toggle('aberto')">📋</button>
-<div class="aba-ticket" id="ticket">
-  <h3>📋 Registro</h3>
-  <div class="linha-ticket">
-    <strong>Ticket L-005 • Fabrício</strong>
-    <div class="conteudo-ticket">
-      📝 Motivo: Desrespeito ao dono, comportamento inadequado<br><br>
-      🚫 Situação: <strong>Banido Permanentemente — Impossível Reverter</strong>
-    </div>
-  </div>
+<div class="lista">
+  <h2>✅ Lista de Autorizados</h2>
+  <div class="autorizado">Cristiano — Dono / Organizador <span class="status-badge badge-autorizado">Presente</span></div>
+  <div class="autorizado">Quito — Reintegração autorizada <span class="status-badge badge-autorizado">Autorizado</span></div>
+  
+  <h2 style="margin-top:25px;">🚫 Registro de Banimentos Permanentes</h2>
+  <div class="banido">Fabrício — Banido permanentemente, impossível reverter <span class="status-badge badge-banido">Banido</span></div>
 </div>
 
 <footer>
-  <p>Versão 1.2</p>
-  <div class="contador" id="visitas">👀 Página visualizada: 0 vezes</div>
+  Sistema de Controle — Versão 1.1<br>
+  Contador em tempo real ✅
 </footer>
 
 <script>
-  // Contador de visitas
-  let v = localStorage.getItem('v') || 0;
-  v = Number(v) + 1;
-  localStorage.setItem('v', v);
-  document.getElementById('visitas').innerHTML = '👀 Página visualizada: <strong>' + v + '</strong> vezes';
+  const firebaseConfig = {
+    apiKey: "AIzaSyA93vtaPYWzUfD1zWj0wKdGtDnPvLhQfXU",
+    authDomain: "site-lanche-33a7e.firebaseapp.com",
+    databaseURL: "https://site-lanche-33a7e-default-rtdb.firebaseio.com/",
+    projectId: "site-lanche-33a7e",
+    storageBucket: "site-lanche-33a7e.appspot.com",
+    messagingSenderId: "228670387373",
+    appId: "1:228670387373:web:a1ea298595a2b7188d48"
+  };
 
-  // Curtidas — cada pessoa vê seu próprio contador
-  let c = Number(localStorage.getItem('curtidas22')) || 0;
-  document.getElementById('curtidas').textContent = c;
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const contadorRef = database.ref('contador_curtidas');
 
-  function somar() {
-    c = c + 1;
-    localStorage.setItem('curtidas22', c);
-    document.getElementById('curtidas').textContent = c;
+  contadorRef.on('value', (snapshot) => {
+    const valor = snapshot.val() || 0;
+    document.getElementById('contador').textContent = valor;
+    document.getElementById('atualizacao').textContent = '✅ Atualizado agora!';
+    document.getElementById('botaoCurtir').disabled = false;
+  });
+
+  function curtir() {
+    document.getElementById('botaoCurtir').disabled = true;
+    contadorRef.transaction((atual) => {
+      return (atual || 0) + 1;
+    }).then(() => {
+      document.getElementById('atualizacao').textContent = '✅ Obrigado!';
+      setTimeout(() => {
+        document.getElementById('atualizacao').textContent = '👆 Clique para confirmar!';
+        document.getElementById('botaoCurtir').disabled = false;
+      }, 2000);
+    }).catch((erro) => {
+      alert('Tente novamente!');
+      document.getElementById('botaoCurtir').disabled = false;
+    });
   }
 </script>
+
 </body>
 </html>
